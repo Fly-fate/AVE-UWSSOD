@@ -19,7 +19,7 @@ pip3 install -v -e .  # or  python3 setup.py develop
 <summary>Download data</summary>
 To ensure the fairness of the results we use the [STAC](https://github.com/google-research/ssl_detection/tree/master) paradigm for dataset partitioning.  
 
-**step1.下载水下数据集`URPC2020`**
+**step1.Download underwater data set `URPC2020`**
 ```shell
 mkdir -p ${COCODIR}
 cd ${COCODIR}
