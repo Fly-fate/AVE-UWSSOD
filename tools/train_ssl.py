@@ -40,29 +40,18 @@ def make_parser():
     parser.add_argument(
         "-d", "--devices", default=0, type=int, help="device for training"
     )
-    # parser.add_argument(
-    #     "-d", "--devices", default=None, type=int, help="device for training"
-    # )
     parser.add_argument(
         "-f",
         "--exp_file",
-        default="/home/21131213348/isp_yolox/YOLOX_peleenet_1_ssl_copy/exps/example/yolox_voc/yolox_voc_nano_ssl.py",
+        default="",
         type=str,
         help="plz input your experiment description file",
     )
-    # parser.add_argument(
-    #     "-f",
-    #     "--exp_file",
-    #     default=None,
-    #     type=str,
-    #     help="plz input your experiment description file",
-    # )
+
     parser.add_argument(
         "--resume", default=False, action="store_true", help="resume training"
     )
-    #parser.add_argument("-c", "--ckpt", default="/home/zhouyue/yolox/YOLOX/weights/yolox_cspdarknet_nano.pth", type=str, help="checkpoint file")
-    parser.add_argument("-c", "--ckpt", default="/home/21131213348/isp_yolox/YOLOX_peleenet_1_ssl_copy/weights/yolox_nano.pth", type=str, help="checkpoint file")
-    #parser.add_argument("-c", "--ckpt", default=None, type=str, help="checkpoint file")
+    parser.add_argument("-c", "--ckpt", default="", type=str, help="checkpoint file")
     parser.add_argument(
         "-e",
         "--start_epoch",
@@ -113,13 +102,9 @@ def make_parser():
         default=None,
         nargs=argparse.REMAINDER,
     )
-    #-------------------------------------ssl----------------------------------------------#
-    #parser.add_argument("--mu", type=int, default=1, help="unlabeled是labeled的mu倍")
-    #parser.add_argument("--WU", type=int, default=1, help="unlabeled loss的权重") #在yolo_head_ssl.py中设置了
+
     parser.add_argument("-u", "--batch-size-unlabeled", type=int, default=2, help="unlabeled batch size")
-    #--------------------------------------------------------------------------------------#
-    # parser.add_argument("--project", type=str, default="YOLOX", help="project name")
-    # parser.add_argument("--entity", type=str, default="zhouyue", help="")
+
 
     return parser
 

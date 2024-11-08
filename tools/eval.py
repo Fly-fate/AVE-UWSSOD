@@ -40,7 +40,6 @@ def make_parser():
         help="url used to set up distributed training",
     )
     parser.add_argument("-b", "--batch-size", type=int, default=32, help="batch size")
-    #parser.add_argument("-b", "--batch-size", type=int, default=64, help="batch size")
     parser.add_argument(
         "-d", "--devices", default=None, type=int, help="device for training"
     )
@@ -53,19 +52,12 @@ def make_parser():
     parser.add_argument(
         "-f",
         "--exp_file",
-        default="/home/zhouyue/yolox/YOLOX/exps/example/yolox_voc/yolox_voc_nano.py",
+        default="",
         type=str,
         help="please input your experiment description file",
     )
-    # parser.add_argument(
-    #     "-f",
-    #     "--exp_file",
-    #     default=None,
-    #     type=str,
-    #     help="please input your experiment description file",
-    # )
-    parser.add_argument("-c", "--ckpt", default="/home/21131213348/yolox/YOLOX/YOLOX_outputs/yolox_voc_nano/ckpt_gpu22(A100)", type=str, help="ckpt for eval")
-    #parser.add_argument("-c", "--ckpt", default=None, type=str, help="ckpt for eval")
+
+    parser.add_argument("-c", "--ckpt", default="", type=str, help="ckpt for eval")
     parser.add_argument("--conf", default=None, type=float, help="test conf")
     parser.add_argument("--nms", default=None, type=float, help="test nms threshold")
     parser.add_argument("--tsize", default=None, type=int, help="test img size")
@@ -139,13 +131,12 @@ def main(exp, args, num_gpu):
 
     rank = get_local_rank()
 
-    file_name = os.path.join(exp.output_dir, args.experiment_name) #和建立日志有关
+    file_name = os.path.join(exp.output_dir, args.experiment_name)
 
     if rank == 0:
-        os.makedirs(file_name, exist_ok=True) #新建文件夹，以实验名字命名
+        os.makedirs(file_name, exist_ok=True)
     
     setup_logger(file_name, distributed_rank=rank, filename="test_log.txt", mode="a") #测试记录
-    #setup_logger(file_name, distributed_rank=rank, filename="val_log.txt", mode="a") #在上述文件夹下建立日志：val_log.txt
     logger.info("Args: {}".format(args))
 
     if args.conf is not None:
@@ -155,7 +146,7 @@ def main(exp, args, num_gpu):
     if args.tsize is not None:
         exp.test_size = (args.tsize, args.tsize)
 
-    model = exp.get_model() #获得模型
+    model = exp.get_model()
     logger.info("Model Summary: {}".format(get_model_info(model, exp.test_size)))
     logger.info("Model Structure:\n{}".format(str(model)))
 
@@ -175,8 +166,8 @@ def main(exp, args, num_gpu):
         logger.info("loading checkpoint from {}".format(ckpt_file))
         loc = "cuda:{}".format(rank)
         ckpt = torch.load(ckpt_file, map_location=loc)
-        model.load_state_dict(ckpt["model"]) #加载模型权重
-        logger.info("loaded checkpoint done.") ###写入log
+        model.load_state_dict(ckpt["model"])
+        logger.info("loaded checkpoint done.")
 
     if is_distributed:
         model = DDP(model, device_ids=[rank])
@@ -209,7 +200,7 @@ def main(exp, args, num_gpu):
 if __name__ == "__main__":
     configure_module()
     args = make_parser().parse_args()
-    exp = get_exp(args.exp_file, args.name) #获得实验配置文件，返回exp类，此时返回yolox_voc_nano.py中的exp类
+    exp = get_exp(args.exp_file, args.name)
     exp.merge(args.opts)
 
     if not args.experiment_name:

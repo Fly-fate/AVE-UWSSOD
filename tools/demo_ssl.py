@@ -31,7 +31,7 @@ def make_parser():
     parser.add_argument("-n", "--name", type=str, default=None, help="model name")
 
     parser.add_argument( #地址可以是放待处理图像的文件夹
-        "--path", default="/home/zhouyue/yolox/YOLOX/000896.jpg",  type=str, help="path to images or video"
+        "--path", default="",  type=str, help="path to images or video"
     )
     parser.add_argument("--camid", type=int, default=0, help="webcam demo camera id")
     parser.add_argument(
@@ -44,11 +44,11 @@ def make_parser():
     parser.add_argument(
         "-f",
         "--exp_file",
-        default="/home/zhouyue/yolox/YOLOX/exps/example/yolox_voc/yolox_voc_nano.py",
+        default="",
         type=str,
         help="please input your experiment description file",
     )
-    parser.add_argument("-c", "--ckpt", default="/home/zhouyue/yolox/YOLOX/weights/best_ckpt_167736.pth", type=str, help="ckpt for eval")
+    parser.add_argument("-c", "--ckpt", default="", type=str, help="ckpt for eval")
     parser.add_argument(
         "--device",
         default="gpu",
@@ -146,9 +146,8 @@ class Predictor(object):
         img_info["ratio"] = ratio #0.333333
         
         #1.图像缩放为(640,640);2.图像格式转换cv2.imread读入(640,640,3)-->网络处理(3,640,640);3.图像数据类型转换
-        img, _ = self.preproc(img, None, self.test_size) #(3, 640, 640)
-        #torch.from_numpy()方法把数组转换成张量，且二者共享内存，对张量进行修改比如重新赋值，那么原始数组也会相应发生改变。
-        img = torch.from_numpy(img).unsqueeze(0) #torch.Size([1, 3, 640, 640])
+        img, _ = self.preproc(img, None, self.test_size)
+        img = torch.from_numpy(img).unsqueeze(0)
         img = img.float()
         if self.device == "gpu": #执行
             img = img.cuda()
@@ -157,12 +156,10 @@ class Predictor(object):
 
         with torch.no_grad():
             t0 = time.time()
-            #inps_256_256 = nn.functional.interpolate(img, size=(256,256)) #1 #将输入图像缩放为256*256 #不需要改了！！！           
             
             inps_304_304 = nn.functional.interpolate(img, size=(304,304))
-            
-            #outputs,image_afterprocess = self.model(inps_256_256,img) #2
-            outputs,image_afterprocess = self.model(inps_304_304,img) #2 
+
+            outputs,image_afterprocess = self.model(inps_304_304,img)
             
             if self.decoder is not None:
                 outputs = self.decoder(outputs, dtype=outputs.type())
@@ -173,14 +170,14 @@ class Predictor(object):
             logger.info("Infer time: {:.4f}s".format(time.time() - t0))
         return outputs, img_info, image_afterprocess
 
-    def visual(self, image_name, output, img_info, cls_conf=0.35): #output:torch.Size([18, 7])
-        ratio = img_info["ratio"] #0.3333333333333333
-        img = img_info["raw_img"] #原图，没有resize
+    def visual(self, image_name, output, img_info, cls_conf=0.35):
+        ratio = img_info["ratio"]
+        img = img_info["raw_img"]
         if output is None:
             return img
         output = output.cpu()
 
-        bboxes = output[:, 0:4] #torch.Size([18, 4])
+        bboxes = output[:, 0:4]
 
         # preprocessing: resize #将预测框大小还原到与原图对应！！！
         bboxes /= ratio
@@ -193,15 +190,14 @@ class Predictor(object):
 
 
 def image_demo(predictor, vis_folder, path, current_time, save_result):
-    if os.path.isdir(path): #判断图像地址是否是文件夹，是文件夹说明有多个图像
+    if os.path.isdir(path):
         files = get_image_list(path)
     else:
-        files = [path] #['/home/zhouyue/yolox/YOLOX/assets/c000017.jpg']
+        files = [path]
     files.sort()
-    for image_name in files: #遍历文件夹中的所有图像
+    for image_name in files:
         outputs, img_info, image_afterprocess= predictor.inference(image_name) #3
         result_image = predictor.visual(image_name, outputs[0], img_info, predictor.confthre)
-        #result_image = predictor.visual(outputs[0], img_info, predictor.confthre) #可视化结果：(1080, 1920, 3)
         if save_result:
             save_folder = os.path.join(
                 vis_folder, time.strftime("%Y_%m_%d_%H_%M_%S", current_time)
@@ -210,9 +206,6 @@ def image_demo(predictor, vis_folder, path, current_time, save_result):
             save_file_name = os.path.join(save_folder, os.path.basename(image_name))
             logger.info("Saving detection result in {}".format(save_file_name))
             cv2.imwrite(save_file_name, result_image)
-        # ch = cv2.waitKey(0) # 设置 waitKey(0) , 则表示程序会无限制的等待用户的按键事件
-        # if ch == 27 or ch == ord("q") or ch == ord("Q"): #按这几个键则停止for循环，按其他键则继续for循环，即继续预测文件夹中剩下的图像
-        #     break
 
         #保存预处理后的图像###4
         image_array = image_afterprocess.cpu().numpy()       
@@ -264,12 +257,12 @@ def main(exp, args):
     if not args.experiment_name:
         args.experiment_name = exp.exp_name
 
-    file_name = os.path.join(exp.output_dir, args.experiment_name) #/home/zhouyue/yolox/YOLOX/YOLOX_outputs/yolox_voc_nano
+    file_name = os.path.join(exp.output_dir, args.experiment_name)
     os.makedirs(file_name, exist_ok=True)
 
     vis_folder = None
     if args.save_result: #args.save_result=True
-        vis_folder = os.path.join(file_name, "vis_res") #/home/zhouyue/yolox/YOLOX/YOLOX_outputs/yolox_voc_nano/vis_res
+        vis_folder = os.path.join(file_name, "vis_res")
         os.makedirs(vis_folder, exist_ok=True)
 
     if args.trt: #false
@@ -285,18 +278,17 @@ def main(exp, args):
         exp.test_size = (args.tsize, args.tsize) ###(640,640)
 
     model = exp.get_model()
-    #logger.info("Model Summary: {}".format(get_model_info(model, exp.test_size)))
 
-    if args.device == "gpu": #args.device=="gpu"
+    if args.device == "gpu":
         model.cuda()
-        if args.fp16: #false
-            model.half()  # to FP16
+        if args.fp16:
+            model.half()
     model.eval()
 
-    if not args.trt: #false
-        if args.ckpt is None: #不执行
+    if not args.trt:
+        if args.ckpt is None:
             ckpt_file = os.path.join(file_name, "best_ckpt.pth")
-        else: #执行
+        else:
             ckpt_file = args.ckpt
         logger.info("loading checkpoint")
         ckpt = torch.load(ckpt_file, map_location="cpu")
@@ -304,11 +296,11 @@ def main(exp, args):
         model.load_state_dict(ckpt["model"])
         logger.info("loaded checkpoint done.")
 
-    if args.fuse: #false
+    if args.fuse:
         logger.info("\tFusing model...")
         model = fuse_model(model)
 
-    if args.trt: #false
+    if args.trt:
         assert not args.fuse, "TensorRT model is not support model fusing!"
         trt_file = os.path.join(file_name, "model_trt.pth")
         assert os.path.exists(
@@ -325,10 +317,7 @@ def main(exp, args):
         model, exp, voc_classes.VOC_CLASSES, trt_file, decoder, #decoder = None
         args.device, args.fp16, args.legacy,
     )
-    # predictor = Predictor(
-    #     model, exp, COCO_CLASSES, trt_file, decoder,
-    #     args.device, args.fp16, args.legacy,
-    # )
+
     current_time = time.localtime()
     if args.demo == "image":
         image_demo(predictor, vis_folder, args.path, current_time, args.save_result)
@@ -338,6 +327,6 @@ def main(exp, args):
 
 if __name__ == "__main__":
     args = make_parser().parse_args()
-    exp = get_exp(args.exp_file, args.name) #初始化yolox_voc_nano.py文件中的Exp类
+    exp = get_exp(args.exp_file, args.name)
 
     main(exp, args)
