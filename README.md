@@ -17,12 +17,44 @@ pip3 install -v -e .  # or  python3 setup.py develop
 
 <details>
 <summary>Download data</summary>
+To ensure the fairness of the results we use the [STAC](https://github.com/google-research/ssl_detection/tree/master) paradigm for dataset partitioning.  
 
+**step1.下载水下数据集`URPC2020`**
 ```shell
-mkdir -p ${VOCDIR}
-cd ${VOCDIR}
+mkdir -p ${COCODIR}
+cd ${COCODIR}
 wget https://drive.usercontent.google.com/download?id=1PgP7gY1FkcpQ1D6XW_lPzTYCgsMhItbw&export=download&authuser=0&confirm=t&uuid=2f3b1cef-e48f-430d-a015-6ecba5466ebd&at=AENtkXY_kzd_2W_mpgmnLWiPMl4c%3A1731054381954
 tar -xf URPC2020_detection.tar
+```
+**step2.Generate labeled and unlabeled splits**
+
+- **format converter from pascal voc to coco.**
+If you are using a VOC dataset instead of a COCO format dataset you can format it using the following command
+
+```bash
+cd ${PRJROOT}/datasets
+
+python3 pascal_voc_xml2json.py --data_dir $VOCDIR
+
+# resulting format
+# ${VOCDIR}
+#   - VOCdevkit
+#       - Annotations
+#       - JPEGImages
+
+```
+- **Generate labeled and unlabeled splits with different proportions of labeled data**
+```
+cd ${PRJROOT}/prepare_datasets
+
+# Format:
+#  labeled split - <datasetname>.<seed>@<percent_of_labeld>
+#  unlabeled split - <datasetname>.<seed>@<percent_of_labeld>-unlabeled
+for seed in 1 2 3 4 5; do
+  for percent in 1 2 5 10 20; do
+    python3 prepare_coco_data.py --percent $percent --seed $seed &
+  done
+done
 ```
 
 </details>
@@ -30,7 +62,11 @@ tar -xf URPC2020_detection.tar
 <details>
 <summary>Training</summary>
 
-**Step1.Train model on labeled data**
+The following example uses labeled data as 10% train2017 and rest 90% train2017 data as unlabeled data, with YOLOX-Nano as the baseline model.
+
+- **Step1.Train model on labeled data**
+This step trains a standard detector on labeled data
+
 ```shell
 python tools/train.py \
     --batch-size  64 \
@@ -38,7 +74,8 @@ python tools/train.py \
     --ckpt /path/to/your/yolox_nano.pth \
 ```
 
-**Step2.Generate pseudo labels of unlabeled data**
+- **Step2.Generate pseudo labels of unlabeled data**
+In this step we use unlabeled data for inference to generate high quality for labeling while Set to use original images rather than resized ones for inference.
 ```shell
 python tools/eval_ssl.py \
     -path /path/to/your/unlabel_dataset \
@@ -46,7 +83,8 @@ python tools/eval_ssl.py \
     --ckpt /path/to/your/ckpt.pth \
 ```
 
-**Step3.Train AVE-UWSSOD**
+- **Step3.Train AVE-UWSSOD**
+ Use labeled data and unlabeled data with pseudo labels to train a AVE-UWSSOD detector
 ```shell
 python tools/train_ssl.py \
     --batch-size 8 \
