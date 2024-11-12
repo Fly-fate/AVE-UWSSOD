@@ -4,61 +4,7 @@ AVE-UWSSOD is a network model focused on underwater target detection that combin
 ![AVE-UWSSOD workflows](https://github.com/Fly-fate/AVE-UWSSOD/blob/master/docs/workflows.png)
 
 ## Data Provided
-Since the URPC2020 dataset exceeds GitHub's size limit, we provide a download link for the URPC2020 dataset [here](https://drive.google.com/file/d/1PgP7gY1FkcpQ1D6XW_lPzTYCgsMhItbw/view?usp=sharing).
-数据存放结构默认如下：
-
-```text
-lqit
-lqit
-├── lqit
-├── tools
-├── configs
-├── data
-│   ├── URPC
-│   │   ├── annotations_json       # coco 风格的标注文件夹
-│   │   │   ├── train.json         # 从训练数据中划分的训练组标注文件，包括 4,434 张图片
-│   │   │   ├── val.json           # 从训练数据中划分的验证组标注文件，包括 1,019 张图片
-│   │   │   ├── train_all.json     # 训练集标注文件，包括 5,543 张图片
-│   │   │   ├── test-A.json        # 测试集 A 标注文件，包含 800 张图片
-│   │   │   ├── test-B.json        # 测试集 B 标注文件，包含 1,200 张图片
-│   │   │   ├── train-image        # 训练图片
-│   │   │   │   ├── 000001.jpg
-│   │   │   │   ├── 000002.jpg
-│   │   │   │   ├── ...
-│   │   │   ├── test-A-image       # 测试集 A 图片
-│   │   │   │   ├── 000001.jpg
-│   │   │   │   ├── 000002.jpg
-│   │   │   │   ├── ...
-│   │   │   ├── test-B-image       # 测试集 B 图片
-│   │   │   │   ├── 000001.jpg
-│   │   │   │   ├── 000002.jpg
-│   │   │   │   ├── ...
-|   |   ├── source_data            # 原始数据文件，下载地址：https://openi.pcl.ac.cn/OpenOrcinus_orca/URPC_opticalimage_dataset/datasets
-│   │   │   ├── ImageSets          # 从脚本获得的训练、验证、测试图像名文件
-│   │   │   │   ├── train.txt
-│   │   │   │   ├── val.txt
-│   │   │   │   ├── train_all.txt
-│   │   │   │   ├── test-A.txt
-│   │   │   │   ├── test-B.txt
-│   │   │   ├── ImageMetas         # 从脚本获得的图像信息文件
-│   │   │   │   ├── train-image-metas.pkl
-│   │   │   │   ├── val-image-metas.pkl
-│   │   │   │   ├── train_all-image-metas.pkl
-│   │   │   │   ├── test-A-image-metas.pkl
-│   │   │   │   ├── test-B-image-metas.pkl
-│   │   │   ├── train-box          # pascal voc 风格的训练集标注文件
-│   │   │   │   ├── 000001.xml
-│   │   │   │   ├── 000002.xml
-│   │   │   │   ├── ...
-│   │   │   ├── test-A-box         # pascal voc 风格的测试集 A 标注文件
-│   │   │   │   ├── 000001.xml
-│   │   │   │   ├── 000002.xml
-│   │   │   │   ├── ...
-│   │   │   ├── test-B-box         # pascal voc 风格的测试集 B 标注文件
-│   │   │   │   ├── 000001.xml
-│   │   │   │   ├── 000002.xml
-│   │   │   │   ├── ...
-```
+Since the URPC2020 dataset exceeds GitHub's size limit, we provide a download link for the URPC2020 dataset [here](https://drive.google.com/file/d/1PgP7gY1FkcpQ1D6XW_lPzTYCgsMhItbw/view?usp=sharing).The URPC2020 training dataset is randomly divided into training and validation groups with 4,434 and 1,019 images, respectively.
 ## To reproduce the results in the paper
 ### Installation
 
