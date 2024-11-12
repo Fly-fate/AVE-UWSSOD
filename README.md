@@ -4,8 +4,7 @@ AVE-UWSSOD is a network model focused on underwater target detection that combin
 ![AVE-UWSSOD workflows](https://github.com/Fly-fate/AVE-UWSSOD/blob/master/docs/workflows.png)
 
 ## To reproduce the results in the paper
-<details>
-<summary>Installation</summary>
+### Installation
 
 Install AVE-UWSSOD from source.
 ```shell
@@ -13,10 +12,10 @@ https://github.com/Fly-fate/AVE-UWSSOD.git
 pip3 install -v -e .  # or  python3 setup.py develop
 ```
 
-</details>
 
-<details>
-<summary>Download data</summary>
+
+
+### Download data
 To ensure the fairness of the results we use the [STAC](https://github.com/google-research/ssl_detection/tree/master) paradigm for dataset partitioning.  
 
 **step1.Download underwater data set `URPC2020`**
@@ -57,10 +56,10 @@ for seed in 1 2 3 4 5; do
 done
 ```
 
-</details>
 
-<details>
-<summary>Training</summary>
+
+
+### Training
 
 The following example uses labeled data as 10% train2017 and rest 90% train2017 data as unlabeled data, with YOLOX-Nano as the baseline model.
 
@@ -91,10 +90,10 @@ python tools/train_ssl.py \
     --exp_file ./exps/example/yolox_voc/yolox_voc_nano_ssl.py \
     --batch-size-unlabeled 8
 ```
-</details>
 
-<details>
-<summary>Evaluation</summary>
+
+
+### Evaluation
 
 ```shell
 python tools/eval.py \
@@ -104,7 +103,6 @@ python tools/eval.py \
     --ckpt /path/to/your/ckpt.pth 
 ```
 
-</details>
 
 ## Acknowledgements
 For the comparison against other methods, we use the official implementations from the following repositories:
