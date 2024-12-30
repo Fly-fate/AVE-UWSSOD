@@ -13,7 +13,7 @@ pip3 install -v -e .  # or  python3 setup.py develop
 
 ### Training
 
-The following example uses labeled data as 10% train2017 and rest 90% train2017 data as unlabeled data, with YOLOX-Nano as the baseline model.
+The following example uses labeled data as 10% train and rest 90% train data as unlabeled data, with YOLOX-Nano as the baseline model.
 
 - **Step1.Train model on labeled data**
 This step trains a standard detector on labeled data
