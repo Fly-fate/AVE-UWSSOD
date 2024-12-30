@@ -3,9 +3,6 @@ AVE-UWSSOD is a network model focused on underwater target detection that combin
 ![AVE-UWSSOD Image](https://github.com/Fly-fate/AVE-UWSSOD/blob/master/docs/AVE-SSOD.png)
 ![AVE-UWSSOD workflows](https://github.com/Fly-fate/AVE-UWSSOD/blob/master/docs/workflows.png)
 
-## Data Provided
-Since the URPC2020 dataset exceeds GitHub's size limit, we provide a download link for the URPC2020 dataset [here](https://drive.google.com/file/d/1PgP7gY1FkcpQ1D6XW_lPzTYCgsMhItbw/view?usp=sharing).The URPC2020 training dataset is randomly divided into training and validation groups with 4,434 and 1,019 images, respectively.
-## To reproduce the results in the paper
 ### Installation
 
 Install AVE-UWSSOD from source.
@@ -13,53 +10,6 @@ Install AVE-UWSSOD from source.
 https://github.com/Fly-fate/AVE-UWSSOD.git
 pip3 install -v -e .  # or  python3 setup.py develop
 ```
-
-
-
-
-### Download data
-To ensure the fairness of the results we use the [STAC](https://github.com/google-research/ssl_detection/tree/master) paradigm for dataset partitioning.  
-
-**step1.Download underwater data set `URPC2020`**
-```shell
-mkdir -p ${COCODIR}
-cd ${COCODIR}
-wget https://drive.usercontent.google.com/download?id=1PgP7gY1FkcpQ1D6XW_lPzTYCgsMhItbw&export=download&authuser=0&confirm=t&uuid=2f3b1cef-e48f-430d-a015-6ecba5466ebd&at=AENtkXY_kzd_2W_mpgmnLWiPMl4c%3A1731054381954
-tar -xf URPC2020_detection.tar
-```
-**step2.Generate labeled and unlabeled splits**
-
-- **format converter from pascal voc to coco.**
-If you are using a VOC dataset instead of a COCO format dataset you can format it using the following command
-
-```bash
-cd ${PRJROOT}/datasets
-
-python3 pascal_voc_xml2json.py --data_dir $VOCDIR
-
-# resulting format
-# ${VOCDIR}
-#   - VOCdevkit
-#       - Annotations
-#       - JPEGImages
-
-```
-- **Generate labeled and unlabeled splits with different proportions of labeled data**
-```
-cd ${PRJROOT}/prepare_datasets
-
-# Format:
-#  labeled split - <datasetname>.<seed>@<percent_of_labeld>
-#  unlabeled split - <datasetname>.<seed>@<percent_of_labeld>-unlabeled
-for seed in 1 2 3 4 5; do
-  for percent in 1 2 5 10 20; do
-    python3 prepare_coco_data.py --percent $percent --seed $seed &
-  done
-done
-```
-
-
-
 
 ### Training
 
